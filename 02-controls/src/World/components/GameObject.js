@@ -3,7 +3,7 @@ import * as CANNON from "cannon-es";
 
 export class GameObject {
     constructor(type, ...args) {
-        this.args = args;
+        this.physicsWorld = GameObject.physicsWorld;
         this.type = type;
         let materialParams = { wireframe: true };
 
@@ -26,11 +26,27 @@ export class GameObject {
         this.transform = this.mesh;
     }
 
-    addRigidBody(physicsWorld, args) {
+    start() {}
+
+    update() {
+        if (this.rb) {
+            this.mesh.position.copy(this.rb.position);
+            this.mesh.quaternion.copy(this.rb.quaternion);
+        }
+    }
+
+    addRigidBody(args) {
+        const physicsWorld = args?.physicsWorld || GameObject.physicsWorld;
+        if (!physicsWorld) {
+            console.error("No physics world specifed");
+            return;
+        }
+
         let params = {
             ...args,
             position: this.mesh.position,
         };
+
         switch (this.type) {
             case "box":
                 const { width, height, depth } = this.geometry.parameters;
@@ -49,25 +65,27 @@ export class GameObject {
                 };
                 break;
             case "plane":
-                // const groundBody = new Body({
-                //     type: Body.STATIC,
-                //     mass: 0,
-                //     shape: new Plane(),
-                //     initQuaternion: CANNON.quaternion.setFromEuler(
-                //         -Math.PI / 2,
-                //         0,
-                //         0
-                //     ),
-                //     init
-                // });
-                // groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0); // make it face up
-                // groundBody.position.y = 0;
+                const quaternion = new CANNON.Quaternion();
+                quaternion.setFromEuler(-Math.PI / 2, 0, 0); // rotate horizontally
+
+                params = {
+                    type: CANNON.Body.STATIC,
+                    mass: 0,
+                    shape: new CANNON.Plane(),
+                    quaternion: quaternion,
+                };
                 break;
         }
 
         this.rb = new CANNON.Body(params);
         physicsWorld.addBody(this.rb);
         this.transform = this.rb;
+
+        // make this.addRigidBody usable both before and after setting transform position
+        this.mesh.position.set(undefined);
+        if (params.type == CANNON.Body.STATIC) {
+            this.update();
+        }
     }
 
     removeRigidBody() {
@@ -75,10 +93,7 @@ export class GameObject {
         this.transform = this.mesh;
     }
 
-    tick() {
-        if (this.rb) {
-            this.mesh.position.copy(this.rb.position);
-            this.mesh.quaternion.copy(this.rb.quaternion);
-        }
+    static setPhysicsWorld(physicsWorld) {
+        GameObject.physicsWorld = physicsWorld;
     }
 }
