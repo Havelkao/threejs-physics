@@ -93,6 +93,8 @@ export class GameObject {
         this.transform = this.mesh;
     }
 
+    addMaterial() {}
+
     static setPhysicsWorld(physicsWorld) {
         GameObject.physicsWorld = physicsWorld;
     }

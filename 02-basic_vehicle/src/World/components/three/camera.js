@@ -7,7 +7,7 @@ function createCamera(
     far = 1000
 ) {
     const camera = new PerspectiveCamera(fov, ar, near, far);
-    const position = 10;
+    const position = 5;
     camera.position.set(position, position, position);
 
     return camera;
