@@ -10,15 +10,15 @@ export class ThirdPersonCamera {
 
     _calculatePosition(x, y, z) {
         const offset = new THREE.Vector3(x, y, z);
-        offset.applyQuaternion(this.target.transform.quaternion);
-        offset.add(this.target.transform.position);
+        offset.applyQuaternion(this.target.quaternion);
+        offset.add(this.target.position);
 
         return offset;
     }
 
     update(delta) {
-        const offset = this._calculatePosition(0, 5, -10);
-        const lookAt = this._calculatePosition(0, 5, 20);
+        const offset = this._calculatePosition(15, 7, 0);
+        const lookAt = this._calculatePosition(-15, 5, 0);
 
         // https://www.youtube.com/watch?v=UuNPHOJ_V5o
         // const t = 0.05;
