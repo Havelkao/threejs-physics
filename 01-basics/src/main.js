@@ -1,4 +1,4 @@
-import './style.css'
+import "./style.css";
 import { World } from "./World/World";
 
 const container = document.querySelector("#app");
