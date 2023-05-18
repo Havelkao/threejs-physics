@@ -35,7 +35,7 @@ class World {
         vehicle.addToWorld();
         scene.add(...vehicle.meshes);
 
-        new PlayerController(vehicle.body);
+        new PlayerController(vehicle.body, container);
         const thirdPersonCamera = new ThirdPersonCamera(
             vehicle.body.chassisBody,
             camera

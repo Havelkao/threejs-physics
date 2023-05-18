@@ -1,13 +1,16 @@
+import nipplejs from "nipplejs";
+
 export class PlayerController {
-    constructor(vehicle) {
+    constructor(vehicle, container) {
         this.vehicle = vehicle;
+        this.container = container;
         this.addKeyBinding(vehicle);
+        this.joystick = new Joystick(container, vehicle);
     }
 
     addKeyBinding(vehicle) {
         document.addEventListener("keydown", (event) => {
             const maxSteerVal = Math.PI / 6;
-            // const maxSpeed = 10;
             const maxForce = 140;
 
             switch (event.key) {
@@ -19,8 +22,8 @@ export class PlayerController {
 
                 case "s":
                 case "ArrowDown":
-                    vehicle.setWheelForce(-maxForce / 2, 2);
-                    vehicle.setWheelForce(maxForce / 2, 3);
+                    vehicle.setWheelForce(-maxForce, 2);
+                    vehicle.setWheelForce(maxForce, 3);
                     break;
 
                 case "a":
@@ -64,6 +67,41 @@ export class PlayerController {
                     vehicle.setSteeringValue(0, 1);
                     break;
             }
+        });
+    }
+}
+
+class Joystick {
+    constructor(container, vehicle) {
+        this.container = container;
+
+        const joystick = nipplejs.create({
+            zone: container,
+            mode: "dynamic",
+            position: { left: "50%", top: "50%" },
+            color: "white",
+        });
+
+        joystick.on("move", (_, data) => {
+            const { x, y } = data.vector;
+
+            const maxSteerVal = Math.PI / 6;
+            const maxForce = 140;
+
+            const force = maxForce * y;
+            const steer = maxSteerVal * x;
+
+            vehicle.setWheelForce(force, 2);
+            vehicle.setWheelForce(-force, 3);
+            vehicle.setSteeringValue(-steer, 0);
+            vehicle.setSteeringValue(-steer, 1);
+        });
+
+        joystick.on("end", () => {
+            vehicle.setWheelForce(0, 2);
+            vehicle.setWheelForce(0, 3);
+            vehicle.setSteeringValue(0, 0);
+            vehicle.setSteeringValue(0, 1);
         });
     }
 }

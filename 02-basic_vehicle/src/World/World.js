@@ -54,7 +54,7 @@ class World {
         car.rb.linearDamping = 0.3;
         car.transform.position.set(5, 5, -10);
         scene.add(car.mesh);
-        new PlayerController(car);
+        new PlayerController(car, container);
 
         var helper = new THREE.AxesHelper();
         car.mesh.add(helper);
