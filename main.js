@@ -16,6 +16,11 @@ const pages = [
         html: "03-rigid_vehicle/index.html",
         image: "rigid_vehicle.png",
     },
+    {
+        title: "04-raycast_vehicle",
+        html: "04-raycast_vehicle/index.html",
+        image: "rigid_vehicle.png",
+    },
 ];
 
 const Card = (page) => {
