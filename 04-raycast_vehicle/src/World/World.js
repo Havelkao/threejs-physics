@@ -8,7 +8,7 @@ import { GameObject } from "./components/cannon/GameObject";
 import { PlayerController } from "./components/cannon/PlayerController";
 import { ThirdPersonCamera } from "./components/three/ThirdPersonCamera";
 import { RaycastVehicle } from "./components/cannon/RaycastVehicle";
-import CannonDebugger from "cannon-es-debugger";
+import { createTrack } from "./components/three/createTrack";
 
 let camera;
 let renderer;
@@ -27,12 +27,10 @@ class World {
         physicsWorld = createPhysicsWorld();
         GameObject.setPhysicsWorld(physicsWorld);
 
-        const helper = CannonDebugger(scene, physicsWorld);
-
         // Objects
         const floor = new GameObject("plane", 1000, 1000, 50, 50);
         floor.addRigidBody();
-        scene.add(floor.mesh);
+        // scene.add(floor.mesh);
 
         const vehicle = new RaycastVehicle();
         vehicle.addToWorld();
@@ -44,11 +42,15 @@ class World {
             camera
         );
 
+        // track
+        const track = createTrack();
+        scene.add(track);
+
+        //  loop
         loop = new Loop(camera, scene, renderer);
         loop.updatables.push(physicsWorld);
         loop.updatables.push(thirdPersonCamera);
         loop.updatables.push(...vehicle.components);
-        // loop.updatables.push(helper);
     }
 
     // used by Loop
