@@ -2,24 +2,24 @@ import { render, html, svg } from "uhtml";
 
 const pages = [
     {
-        title: "01-basics",
+        title: "Basics",
         html: "01-basics/index.html",
         image: "basics.png",
     },
     {
-        title: "02-basic_vehicle",
+        title: "Basic Vehicle",
         html: "02-basic_vehicle/index.html",
         image: "basic_vehicle.png",
     },
     {
-        title: "03-rigid_vehicle",
+        title: "Rigid Vehicle",
         html: "03-rigid_vehicle/index.html",
         image: "rigid_vehicle.png",
     },
     {
-        title: "04-raycast_vehicle",
+        title: "Raycast Vehicle",
         html: "04-raycast_vehicle/index.html",
-        image: "rigid_vehicle.png",
+        image: "raycast_vehicle.png",
     },
 ];
 

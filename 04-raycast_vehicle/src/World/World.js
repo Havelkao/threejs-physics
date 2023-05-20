@@ -37,7 +37,6 @@ class World {
         const vehicle = new RaycastVehicle();
         vehicle.addToWorld();
         scene.add(...vehicle.meshes);
-        console.log(vehicle);
 
         new PlayerController(vehicle.body, container);
         const thirdPersonCamera = new ThirdPersonCamera(
@@ -48,8 +47,8 @@ class World {
         loop = new Loop(camera, scene, renderer);
         loop.updatables.push(physicsWorld);
         loop.updatables.push(thirdPersonCamera);
-        // loop.updatables.push(...vehicle.components);
-        loop.updatables.push(helper);
+        loop.updatables.push(...vehicle.components);
+        // loop.updatables.push(helper);
     }
 
     // used by Loop

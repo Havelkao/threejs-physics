@@ -55,16 +55,19 @@ export class RaycastVehicle {
                 wheel.radius / 2,
                 20
             );
+            c.mesh.rotateX(-Math.PI / 2);
 
             c.addRigidBody({
                 mass: 0,
                 material: wheelMaterial,
                 type: CANNON.Body.KINEMATIC,
                 collisionFilterGroup: 0,
+                orientation: new CANNON.Quaternion().setFromEuler(
+                    -Math.PI / 2,
+                    0,
+                    0
+                ),
             });
-            c.rb.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
-            c.rb.shapes[0].body.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
-            console.log(c.rb.shapes[0].body.quaternion);
 
             wheelBodies.push(c.rb);
             this.components.push(c);

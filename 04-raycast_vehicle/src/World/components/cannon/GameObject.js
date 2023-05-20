@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import * as CANNON from "cannon-es";
 
+// maybe use https://github.com/donmccurdy/three-to-cannon
+
 export class GameObject {
     constructor(type, ...args) {
         this.physicsWorld = GameObject.physicsWorld;
@@ -27,14 +29,35 @@ export class GameObject {
         this.mesh = new THREE.Mesh(this.geometry, this.material);
 
         this.transform = this.mesh;
+
+        this.start();
     }
 
-    start() {}
+    start() {
+        // if (!this.rb) return;
+
+        this.shapeWorldPosition = new CANNON.Vec3();
+        this.shapeWorldQuaternion = new CANNON.Quaternion();
+    }
 
     update() {
         if (this.rb) {
-            this.mesh.position.copy(this.rb.position);
-            this.mesh.quaternion.copy(this.rb.quaternion);
+            // https://github.com/pmndrs/cannon-es-debugger/blob/master/src/cannon-es-debugger.ts
+            this.rb.quaternion.vmult(
+                this.rb.shapeOffsets[0],
+                this.shapeWorldPosition
+            );
+            this.rb.position.vadd(
+                this.shapeWorldPosition,
+                this.shapeWorldPosition
+            );
+            this.rb.quaternion.mult(
+                this.rb.shapeOrientations[0],
+                this.shapeWorldQuaternion
+            );
+
+            this.mesh.position.copy(this.shapeWorldPosition);
+            this.mesh.quaternion.copy(this.shapeWorldQuaternion);
         }
     }
 
@@ -50,56 +73,49 @@ export class GameObject {
             position: this.mesh.position,
         };
         const geometry = this.geometry.parameters;
+        let shape = args?.shape;
+        let orientation = args?.orientation;
+        let offset = args?.offset;
 
         switch (this.type) {
             case "box":
-                params = {
-                    ...params,
-                    shape: new CANNON.Box(
-                        new CANNON.Vec3(
-                            geometry.width / 2,
-                            geometry.height / 2,
-                            geometry.depth / 2
-                        )
-                    ),
-                };
+                shape = new CANNON.Box(
+                    new CANNON.Vec3(
+                        geometry.width / 2,
+                        geometry.height / 2,
+                        geometry.depth / 2
+                    )
+                );
                 break;
+
             case "sphere":
-                params = {
-                    ...params,
-                    shape: new CANNON.Sphere(geometry.radius),
-                };
+                shape = new CANNON.Sphere(geometry.radius);
                 break;
+
             case "plane":
                 const quaternion = new CANNON.Quaternion();
                 quaternion.setFromEuler(-Math.PI / 2, 0, 0); // rotate horizontally
-
                 params = {
                     type: CANNON.Body.STATIC,
                     mass: 0,
-                    shape: new CANNON.Plane(),
                     quaternion: quaternion,
                 };
+                shape = new CANNON.Plane();
                 break;
+
             case "cylinder":
-                const q = new CANNON.Quaternion();
-                q.setFromEuler(-Math.PI, 0, 0); // rotate horizontally
-
-                params = {
-                    ...params,
-                    shape: new CANNON.Cylinder(
-                        geometry.radiusTop,
-                        geometry.radiusBottom,
-                        geometry.height,
-                        geometry.radialSegments
-                    ),
-
-                    quaternion: q,
-                };
+                shape = new CANNON.Cylinder(
+                    geometry.radiusTop,
+                    geometry.radiusBottom,
+                    geometry.height,
+                    geometry.radialSegments
+                );
                 break;
         }
 
         this.rb = new CANNON.Body(params);
+        this.rb.addShape(shape, offset, orientation);
+
         physicsWorld.addBody(this.rb);
         this.transform = this.rb;
 
